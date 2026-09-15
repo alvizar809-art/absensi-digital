@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Absensi Digital - Login</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="login-box">
+
+            <div class="logo">
+                📋
+            </div>
+
+            <h1>Absensi Digital</h1>
+
+            <p class="subtitle">
+                Silakan login untuk melanjutkan
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Masukkan email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Masukkan password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-button">
+                    Login
+                </button>
+
+            </form>
+
+            <p class="footer-text">
+                Sistem Absensi Digital Sekolah
+            </p>
+
+        </div>
+
+    </div>
+    <script type="module" src="js/firebase.js"></script>
+   <script type="module">
+
+    import { auth, db } from "./js/firebase.js";
+
+    import {
+        signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+    import {
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+    // Mengambil form login
+    const loginForm = document.getElementById("loginForm");
+
+
+    // Ketika tombol Login ditekan
+    loginForm.addEventListener("submit", async function(event) {
+
+        // Mencegah halaman melakukan refresh
+        event.preventDefault();
+
+
+        // Mengambil email dan password
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+
+        // Memastikan email dan password diisi
+        if (email === "" || password === "") {
+
+            alert("Email dan password harus diisi!");
+
+            return;
+        }
+
+
+        try {
+
+            // Login menggunakan Firebase Authentication
+            const userCredential =
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+
+            // Mendapatkan data pengguna
+            const user = userCredential.user;
+
+
+            // Mencari data pengguna berdasarkan UID
+const userQuery = query(
+    collection(db, "users"),
+    where("uid", "==", user.uid)
+);
+
+const userSnapshot = await getDocs(userQuery);
+
+
+// Jika data pengguna tidak ditemukan
+if (userSnapshot.empty) {
+
+    alert("Data pengguna belum tersedia di database.");
+
+    return;
+}
+
+
+// Mengambil data pengguna
+let userData = null;
+
+userSnapshot.forEach((doc) => {
+
+    userData = doc.data();
+
+});
+
+            // Mengecek role pengguna
+            if (userData.role === "admin") {
+
+    alert("Login berhasil! Selamat datang Admin.");
+
+    window.location.href = "admin.html";
+
+} else if (userData.role === "user") {
+
+    alert("Login berhasil! Selamat datang.");
+
+    window.location.href = "dashboard-peserta.html";
+
+} else {
+
+    alert("Role pengguna tidak dikenali.");
+
+}
+
+
+        } catch (error) {
+
+            console.error("Error login:", error);
+
+
+            if (
+                error.code === "auth/invalid-credential" ||
+                error.code === "auth/wrong-password" ||
+                error.code === "auth/user-not-found"
+            ) {
+
+                alert("Email atau password salah.");
+
+            } else {
+
+                alert("Login gagal: " + error.message);
+
+            }
+
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

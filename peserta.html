@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Data Peserta - Absensi Digital</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+
+        /* HEADER */
+
+        .header {
+            background: white;
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            font-size: 21px;
+        }
+
+        .back-button {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+
+        /* CONTAINER */
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+
+        /* TITLE */
+
+        .title-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .title-section h2 {
+            margin-bottom: 8px;
+        }
+
+        .title-section p {
+            color: #666;
+        }
+
+
+        /* BUTTON */
+
+        .add-button {
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+
+        /* TABLE */
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+        }
+
+
+        /* MODAL */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .save-button {
+            flex: 1;
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .cancel-button {
+            flex: 1;
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 17px;
+            }
+
+            .container {
+                margin-top: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <h1>
+            Data Peserta
+        </h1>
+
+        <button
+            class="back-button"
+            id="backButton"
+        >
+            ← Dashboard
+        </button>
+
+    </header>
+
+
+    <!-- CONTENT -->
+
+    <main class="container">
+
+
+        <section class="title-section">
+
+            <h2>
+                👥 Data Peserta
+            </h2>
+
+            <p>
+                Daftar pengguna yang terdaftar
+                dalam sistem absensi.
+            </p>
+
+        </section>
+
+
+        <button
+            class="add-button"
+            id="addButton"
+        >
+            + Tambah Peserta
+        </button>
+
+
+        <!-- TABLE -->
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>No</th>
+
+                        <th>Nama</th>
+
+                        <th>NIS</th>
+
+                        <th>Kelas</th>
+
+                        <th>Email</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="pesertaTable">
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            Memuat data...
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    </main>
+
+
+    <!-- MODAL TAMBAH PESERTA -->
+
+    <div
+        class="modal"
+        id="modal"
+    >
+
+        <div class="modal-content">
+
+            <h2>
+                Tambah Peserta
+            </h2>
+
+
+            <form id="pesertaForm">
+
+
+                <div class="form-group">
+
+                    <label for="nama">
+                        Nama Lengkap
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nama"
+                        placeholder="Contoh: Ahmad Fauzan"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="nis">
+                        NIS
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nis"
+                        placeholder="Contoh: 123456"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="kelas">
+                        Kelas
+                    </label>
+
+                    <select
+                        id="kelas"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih kelas
+                        </option>
+
+                        <option value="7">
+                            Kelas 7
+                        </option>
+
+                        <option value="8">
+                            Kelas 8
+                        </option>
+
+                        <option value="9">
+                            Kelas 9
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Contoh: peserta@gmail.com"
+                        required
+                    >
+
+                </div>
+                <div class="form-group">
+
+    <label for="password">
+        Password
+    </label>
+
+    <input
+        type="password"
+        id="password"
+        placeholder="Minimal 6 karakter"
+        minlength="6"
+        required
+    >
+
+</div>
+
+
+                <div class="modal-buttons">
+
+                    <button
+                        type="button"
+                        class="cancel-button"
+                        id="cancelButton"
+                    >
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="save-button"
+                    >
+                        Simpan
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- FIREBASE -->
+
+   <script type="module">
+
+    import {
+        auth,
+        db,
+        firebaseConfig
+    } from "./js/firebase.js";
+
+
+    import {
+        onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+
+    import {
+        initializeApp
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+
+    import {
+        getAuth,
+        createUserWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+
+    import {
+        collection,
+        getDocs,
+        query,
+        where,
+        addDoc,
+        serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+
+    // ====================================
+    // CEK ADMIN
+    // ====================================
+
+    onAuthStateChanged(auth, async (user) => {
+
+        if (!user) {
+
+            window.location.href = "index.html";
+
+            return;
+
+        }
+
+
+        try {
+
+            const usersQuery = query(
+                collection(db, "users"),
+                where("email", "==", user.email)
+            );
+
+
+            const snapshot =
+                await getDocs(usersQuery);
+
+
+            if (snapshot.empty) {
+
+                alert(
+                    "Data pengguna tidak ditemukan."
+                );
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            let isAdmin = false;
+
+
+            snapshot.forEach((doc) => {
+
+                const data =
+                    doc.data();
+
+
+                if (data.role === "admin") {
+
+                    isAdmin = true;
+
+                }
+
+            });
+
+
+            if (!isAdmin) {
+
+                alert(
+                    "Halaman ini hanya dapat diakses Admin."
+                );
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            // Admin valid
+            loadPeserta();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Gagal memeriksa akses Admin."
+            );
+
+        }
+
+    });
+
+
+    // ====================================
+    // LOAD DATA PESERTA
+    // ====================================
+
+    async function loadPeserta() {
+
+        const table =
+            document.getElementById(
+                "pesertaTable"
+            );
+
+
+        try {
+
+            const snapshot =
+                await getDocs(
+                    collection(db, "users")
+                );
+
+
+            table.innerHTML = "";
+
+
+            let nomor = 1;
+
+
+           snapshot.forEach((doc) => {
+
+    const data =
+        doc.data();
+
+    // Jangan tampilkan Admin
+    if (data.role === "admin") {
+
+        return;
+
+    }
+
+    const row =
+        document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>${nomor}</td>
+
+                    <td>${data.nama || "-"}</td>
+
+                    <td>${data.nis || "-"}</td>
+
+                    <td>${data.kelas || "-"}</td>
+
+                    <td>${data.email || "-"}</td>
+
+                `;
+
+
+                table.appendChild(row);
+
+                nomor++;
+
+            });
+
+
+            if (nomor === 1) {
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            Belum ada peserta.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            table.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty"
+                    >
+                        Gagal mengambil data.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    }
+
+
+    // ====================================
+    // KEMBALI KE DASHBOARD
+    // ====================================
+
+    document.getElementById(
+        "backButton"
+    ).addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "admin.html";
+
+        }
+    );
+
+
+    // ====================================
+    // MODAL TAMBAH PESERTA
+    // ====================================
+
+    const modal =
+        document.getElementById("modal");
+
+
+    document.getElementById(
+        "addButton"
+    ).addEventListener(
+        "click",
+        () => {
+
+            modal.style.display = "flex";
+
+        }
+    );
+
+
+    document.getElementById(
+        "cancelButton"
+    ).addEventListener(
+        "click",
+        () => {
+
+            modal.style.display = "none";
+
+        }
+    );
+
+
+    // ====================================
+    // FIREBASE AUTH SECONDARY
+    // ====================================
+    //
+    // Firebase kedua ini digunakan khusus
+    // untuk membuat akun peserta.
+    //
+    // Akun Admin utama TIDAK akan logout.
+    //
+
+    const secondaryApp =
+        initializeApp(
+            firebaseConfig,
+            "SecondaryApp"
+        );
+
+
+    const secondaryAuth =
+        getAuth(secondaryApp);
+
+
+    // ====================================
+    // TAMBAH PESERTA
+    // ====================================
+
+    document.getElementById(
+        "pesertaForm"
+    ).addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            // Ambil data dari form
+
+            const nama =
+                document.getElementById(
+                    "nama"
+                ).value.trim();
+
+
+            const nis =
+                document.getElementById(
+                    "nis"
+                ).value.trim();
+
+
+            const kelas =
+                document.getElementById(
+                    "kelas"
+                ).value;
+
+
+            const email =
+                document.getElementById(
+                    "email"
+                ).value.trim();
+
+
+            const password =
+                document.getElementById(
+                    "password"
+                ).value;
+
+
+            // Validasi
+
+            if (
+                !nama ||
+                !nis ||
+                !kelas ||
+                !email ||
+                !password
+            ) {
+
+                alert(
+                    "Semua data harus diisi."
+                );
+
+                return;
+
+            }
+
+
+            if (password.length < 6) {
+
+                alert(
+                    "Password minimal 6 karakter."
+                );
+
+                return;
+
+            }
+
+
+            const saveButton =
+                document.querySelector(
+                    ".save-button"
+                );
+
+
+            saveButton.disabled = true;
+
+            saveButton.textContent =
+                "Menyimpan...";
+
+
+            try {
+
+                // =================================
+                // 1. CEK NIS
+                // =================================
+
+                const nisQuery =
+                    query(
+                        collection(
+                            db,
+                            "users"
+                        ),
+                        where(
+                            "nis",
+                            "==",
+                            nis
+                        )
+                    );
+
+
+                const nisSnapshot =
+                    await getDocs(nisQuery);
+
+
+                if (!nisSnapshot.empty) {
+
+                    alert(
+                        "NIS tersebut sudah digunakan."
+                    );
+
+                    saveButton.disabled =
+                        false;
+
+                    saveButton.textContent =
+                        "Simpan";
+
+                    return;
+
+                }
+
+
+                // =================================
+                // 2. BUAT AKUN FIREBASE
+                // =================================
+
+                const userCredential =
+                    await createUserWithEmailAndPassword(
+                        secondaryAuth,
+                        email,
+                        password
+                    );
+
+
+                const pesertaUser =
+                    userCredential.user;
+
+
+                // =================================
+                // 3. SIMPAN DATA KE FIRESTORE
+                // =================================
+
+                await addDoc(
+                    collection(
+                        db,
+                        "users"
+                    ),
+                    {
+
+                        uid:
+                            pesertaUser.uid,
+
+                        nama:
+                            nama,
+
+                        nis:
+                            nis,
+
+                        kelas:
+                            kelas,
+
+                        email:
+                            email,
+
+                        role:
+                            "user",
+
+                        createdAt:
+                            serverTimestamp()
+
+                    }
+                );
+
+
+                // =================================
+                // 4. SELESAI
+                // =================================
+
+                alert(
+                    "Peserta berhasil ditambahkan!"
+                );
+
+
+                // Bersihkan form
+
+                document.getElementById(
+                    "pesertaForm"
+                ).reset();
+
+
+                // Tutup modal
+
+                modal.style.display =
+                    "none";
+
+
+                // Tampilkan data terbaru
+
+                loadPeserta();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+
+                let message =
+                    "Gagal menambahkan peserta.";
+
+
+                if (
+                    error.code ===
+                    "auth/email-already-in-use"
+                ) {
+
+                    message =
+                        "Email tersebut sudah terdaftar.";
+
+                }
+
+
+                if (
+                    error.code ===
+                    "auth/invalid-email"
+                ) {
+
+                    message =
+                        "Format email tidak valid.";
+
+                }
+
+
+                if (
+                    error.code ===
+                    "auth/weak-password"
+                ) {
+
+                    message =
+                        "Password terlalu lemah. Gunakan minimal 6 karakter.";
+
+                }
+
+
+                if (
+                    error.code ===
+                    "permission-denied"
+                ) {
+
+                    message =
+                        "Tidak memiliki izin menyimpan data ke Firestore.";
+
+                }
+
+
+                alert(message);
+
+
+            } finally {
+
+                saveButton.disabled =
+                    false;
+
+                saveButton.textContent =
+                    "Simpan";
+
+            }
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

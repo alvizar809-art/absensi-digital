@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard Peserta - Absensi Digital</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+
+        /* HEADER */
+
+        .header {
+            background: white;
+            padding: 18px 25px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+
+        .header h1 {
+            font-size: 21px;
+        }
+
+
+        .logout-button {
+            background: #dc3545;
+            color: white;
+
+            border: none;
+
+            padding: 10px 16px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+
+        /* CONTAINER */
+
+        .container {
+            max-width: 1000px;
+
+            margin: 30px auto;
+
+            padding: 0 20px;
+        }
+
+
+        /* WELCOME */
+
+        .welcome {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.06);
+        }
+
+
+        .welcome h2 {
+            margin-bottom: 8px;
+        }
+
+
+        .welcome p {
+            color: #666;
+        }
+
+
+        /* USER INFO */
+
+        .user-info {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .info-card {
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.06);
+        }
+
+
+        .info-card span {
+            display: block;
+
+            color: #777;
+
+            font-size: 13px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .info-card strong {
+            font-size: 18px;
+        }
+
+
+        /* ABSENSI */
+
+        .attendance-card {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.06);
+        }
+
+
+        .attendance-card h2 {
+            margin-bottom: 20px;
+        }
+
+
+        .attendance-buttons {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+        }
+
+
+        .attendance-button {
+            border: none;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+
+        .masuk {
+            background: #198754;
+        }
+
+
+        .pulang {
+            background: #dc3545;
+        }
+
+
+        .attendance-status {
+            margin-top: 20px;
+
+            padding: 15px;
+
+            background: #f8f9fa;
+
+            border-radius: 8px;
+
+            text-align: center;
+
+            color: #666;
+        }
+
+
+        /* MOBILE */
+
+        @media (max-width: 700px) {
+
+            .header {
+                padding: 15px;
+            }
+
+
+            .header h1 {
+                font-size: 17px;
+            }
+
+
+            .container {
+                margin-top: 20px;
+            }
+
+
+            .user-info {
+                grid-template-columns: 1fr;
+            }
+
+
+            .attendance-buttons {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <h1>
+            Absensi Digital
+        </h1>
+
+
+        <button
+            class="logout-button"
+            id="logoutButton"
+        >
+            Logout
+        </button>
+
+    </header>
+
+
+    <!-- CONTENT -->
+
+    <main class="container">
+
+
+        <!-- WELCOME -->
+
+        <section class="welcome">
+
+            <h2 id="welcomeText">
+                Selamat datang
+            </h2>
+
+            <p>
+                Silakan melakukan absensi
+                sesuai waktu yang ditentukan.
+            </p>
+
+        </section>
+
+
+        <!-- DATA PESERTA -->
+
+        <section class="user-info">
+
+
+            <div class="info-card">
+
+                <span>
+                    Nama
+                </span>
+
+                <strong id="namaUser">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <span>
+                    NIS
+                </span>
+
+                <strong id="nisUser">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <span>
+                    Kelas
+                </span>
+
+                <strong id="kelasUser">
+                    -
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- ABSENSI -->
+
+        <section class="attendance-card">
+
+            <h2>
+                🕘 Absensi Hari Ini
+            </h2>
+
+
+            <div class="attendance-buttons">
+
+
+                <button
+                    class="attendance-button masuk"
+                    id="absenMasuk"
+                >
+                    🟢 Absen Masuk
+                </button>
+
+
+                <button
+                    class="attendance-button pulang"
+                    id="absenPulang"
+                >
+                    🔴 Absen Pulang
+                </button>
+
+
+            </div>
+
+
+            <div
+                class="attendance-status"
+                id="attendanceStatus"
+            >
+                Status absensi akan tampil
+                di sini.
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- FIREBASE -->
+
+    <script type="module">
+
+        import {
+            auth,
+            db
+        } from "./js/firebase.js";
+
+
+        import {
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+
+       import {
+    collection,
+    query,
+    where,
+    getDocs,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+
+        // ====================================
+        // CEK LOGIN
+        // ====================================
+
+        onAuthStateChanged(
+            auth,
+            async (user) => {
+
+                if (!user) {
+
+                    window.location.href =
+                        "index.html";
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const userQuery =
+                        query(
+                            collection(
+                                db,
+                                "users"
+                            ),
+                            where(
+                                "uid",
+                                "==",
+                                user.uid
+                            )
+                        );
+
+
+                    const snapshot =
+                        await getDocs(
+                            userQuery
+                        );
+
+
+                    if (snapshot.empty) {
+
+                        alert(
+                            "Data pengguna belum tersedia di database."
+                        );
+
+                        await signOut(auth);
+
+                        window.location.href =
+                            "index.html";
+
+                        return;
+
+                    }
+
+
+                    let userData = null;
+
+
+                    snapshot.forEach(
+                        (doc) => {
+
+                            userData =
+                                doc.data();
+
+                        }
+                    );
+
+
+                    // ====================================
+                    // CEK ROLE
+                    // ====================================
+
+                    if (
+                        userData.role !==
+                        "user"
+                    ) {
+
+                        alert(
+                            "Akun ini bukan akun peserta."
+                        );
+
+                        window.location.href =
+                            "index.html";
+
+                        return;
+
+                    }
+
+
+                    // ====================================
+                    // TAMPILKAN DATA
+                    // ====================================
+
+                    document.getElementById(
+                        "welcomeText"
+                    ).textContent =
+                        `Selamat datang, ${userData.nama}`;
+
+
+                    document.getElementById(
+                        "namaUser"
+                    ).textContent =
+                        userData.nama || "-";
+
+
+                    document.getElementById(
+                        "nisUser"
+                    ).textContent =
+                        userData.nis || "-";
+
+
+                    document.getElementById(
+                        "kelasUser"
+                    ).textContent =
+                        userData.kelas || "-";
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    alert(
+                        "Gagal mengambil data pengguna."
+                    );
+
+                }
+
+            }
+        );
+
+
+        // ====================================
+        // LOGOUT
+        // ====================================
+
+        document.getElementById(
+            "logoutButton"
+        ).addEventListener(
+            "click",
+            async () => {
+
+                try {
+
+                    await signOut(auth);
+
+                    window.location.href =
+                        "index.html";
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    alert(
+                        "Gagal logout."
+                    );
+
+                }
+
+            }
+        );
+
+
+     // ====================================
+// ABSEN MASUK + GPS
+// ====================================
+
+document.getElementById(
+    "absenMasuk"
+).addEventListener(
+    "click",
+    async () => {
+
+        // ====================================
+        // KOORDINAT SEKOLAH
+        // ====================================
+
+        const sekolahLatitude =
+            -6.612797876234112;
+
+        const sekolahLongitude =
+            106.73250161403004;
+
+        const radiusMaksimal =
+            20;
+
+
+        // ====================================
+        // CEK BROWSER MENDUKUNG GPS
+        // ====================================
+
+        if (!navigator.geolocation) {
+
+            alert(
+                "Browser atau perangkat kamu tidak mendukung GPS."
+            );
+
+            return;
+
+        }
+
+
+        // ====================================
+        // TAMPILKAN STATUS
+        // ====================================
+
+        const status =
+            document.getElementById(
+                "attendanceStatus"
+            );
+
+        status.textContent =
+            "📍 Sedang mengambil lokasi kamu...";
+
+
+        try {
+
+            // ====================================
+            // CEK USER LOGIN
+            // ====================================
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Sesi login sudah berakhir. Silakan login kembali."
+                );
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            // ====================================
+            // AMBIL LOKASI GPS
+            // ====================================
+
+            navigator.geolocation.getCurrentPosition(
+
+                async (position) => {
+
+                    try {
+
+                        const latitude =
+                            position.coords.latitude;
+
+                        const longitude =
+                            position.coords.longitude;
+
+                        const accuracy =
+                            position.coords.accuracy;
+
+
+                        console.log(
+                            "Latitude:",
+                            latitude
+                        );
+
+                        console.log(
+                            "Longitude:",
+                            longitude
+                        );
+
+                        console.log(
+                            "Akurasi GPS:",
+                            accuracy,
+                            "meter"
+                        );
+
+
+                        // ====================================
+                        // HITUNG JARAK
+                        // ====================================
+
+                        const jarak =
+                            hitungJarak(
+                                latitude,
+                                longitude,
+                                sekolahLatitude,
+                                sekolahLongitude
+                            );
+
+
+                        console.log(
+                            "Jarak ke sekolah:",
+                            jarak,
+                            "meter"
+                        );
+
+
+                        // ====================================
+                        // CEK RADIUS
+                        // ====================================
+
+                        if (
+                            jarak >
+                            radiusMaksimal
+                        ) {
+
+                            status.textContent =
+                                `❌ Kamu berada ${jarak.toFixed(1)} meter dari sekolah. Maksimal 20 meter.`;
+
+                            alert(
+                                `❌ Absen ditolak.\n\nJarak kamu dari sekolah: ${jarak.toFixed(1)} meter\nMaksimal jarak: 20 meter`
+                            );
+
+                            return;
+
+                        }
+
+
+                        // ====================================
+                        // AMBIL DATA PESERTA
+                        // ====================================
+
+                        const userQuery =
+                            query(
+                                collection(
+                                    db,
+                                    "users"
+                                ),
+                                where(
+                                    "uid",
+                                    "==",
+                                    user.uid
+                                )
+                            );
+
+
+                        const userSnapshot =
+                            await getDocs(
+                                userQuery
+                            );
+
+
+                        if (
+                            userSnapshot.empty
+                        ) {
+
+                            alert(
+                                "Data peserta tidak ditemukan."
+                            );
+
+                            return;
+
+                        }
+
+
+                        let userData =
+                            null;
+
+
+                        userSnapshot.forEach(
+                            (doc) => {
+
+                                userData =
+                                    doc.data();
+
+                            }
+                        );
+
+
+                        // ====================================
+                        // TANGGAL & JAM
+                        // ====================================
+
+                        const sekarang =
+                            new Date();
+
+
+                        const tahun =
+                            sekarang.getFullYear();
+
+
+                        const bulan =
+                            String(
+                                sekarang.getMonth() + 1
+                            ).padStart(2, "0");
+
+
+                        const tanggal =
+                            String(
+                                sekarang.getDate()
+                            ).padStart(2, "0");
+
+
+                        const jam =
+                            String(
+                                sekarang.getHours()
+                            ).padStart(2, "0");
+
+
+                        const menit =
+                            String(
+                                sekarang.getMinutes()
+                            ).padStart(2, "0");
+
+
+                        const detik =
+                            String(
+                                sekarang.getSeconds()
+                            ).padStart(2, "0");
+
+
+                        const tanggalHariIni =
+                            `${tahun}-${bulan}-${tanggal}`;
+
+
+                        const jamSekarang =
+                            `${jam}:${menit}:${detik}`;
+
+
+                        // ====================================
+                        // CEK SUDAH ABSEN
+                        // ====================================
+
+                        const absensiQuery =
+                            query(
+                                collection(
+                                    db,
+                                    "absensi"
+                                ),
+                                where(
+                                    "uid",
+                                    "==",
+                                    user.uid
+                                ),
+                                where(
+                                    "tanggal",
+                                    "==",
+                                    tanggalHariIni
+                                )
+                            );
+
+
+                        const absensiSnapshot =
+                            await getDocs(
+                                absensiQuery
+                            );
+
+
+                        if (
+                            !absensiSnapshot.empty
+                        ) {
+
+                            alert(
+                                "Kamu sudah melakukan absen masuk hari ini."
+                            );
+
+                            status.textContent =
+                                "⚠️ Kamu sudah melakukan absen hari ini.";
+
+                            return;
+
+                        }
+
+
+                        // ====================================
+                        // SIMPAN ABSENSI
+                        // ====================================
+
+                        await addDoc(
+                            collection(
+                                db,
+                                "absensi"
+                            ),
+                            {
+
+                                uid:
+                                    user.uid,
+
+                                nama:
+                                    userData.nama ||
+                                    "-",
+
+                                nis:
+                                    userData.nis ||
+                                    "-",
+
+                                kelas:
+                                    userData.kelas ||
+                                    "-",
+
+                                tanggal:
+                                    tanggalHariIni,
+
+                                jamMasuk:
+                                    jamSekarang,
+
+                                jamPulang:
+                                    null,
+
+                                status:
+                                    "Hadir",
+
+                                latitude:
+                                    latitude,
+
+                                longitude:
+                                    longitude,
+
+                                jarakMeter:
+                                    Number(
+                                        jarak.toFixed(2)
+                                    ),
+
+                                akurasiGPS:
+                                    Number(
+                                        accuracy.toFixed(2)
+                                    ),
+
+                                createdAt:
+                                    serverTimestamp()
+
+                            }
+                        );
+
+
+                        // ====================================
+                        // BERHASIL
+                        // ====================================
+
+                        status.textContent =
+                            `✅ Absen masuk berhasil. Jarak ${jarak.toFixed(1)} meter. Akurasi GPS ±${accuracy.toFixed(1)} meter.`;
+
+                        alert(
+                            `✅ Absen masuk berhasil!\n\nTanggal: ${tanggalHariIni}\nJam: ${jamSekarang}\nJarak: ${jarak.toFixed(1)} meter\nAkurasi GPS: ±${accuracy.toFixed(1)} meter`
+                        );
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Error menyimpan absensi:",
+                            error
+                        );
+
+                        status.textContent =
+                            "❌ Gagal menyimpan absensi.";
+
+                        alert(
+                            "Gagal melakukan absen: " +
+                            error.message
+                        );
+
+                    }
+
+                },
+
+
+                (error) => {
+
+                    console.error(
+                        "GPS Error:",
+                        error
+                    );
+
+
+                    status.textContent =
+                        "❌ Lokasi tidak dapat diperoleh.";
+
+
+                    if (
+                        error.code === 1
+                    ) {
+
+                        alert(
+                            "❌ Izin lokasi ditolak.\n\nSilakan aktifkan izin lokasi untuk website ini."
+                        );
+
+                    } else if (
+                        error.code === 2
+                    ) {
+
+                        alert(
+                            "❌ Lokasi tidak tersedia.\n\nPastikan GPS/lokasi perangkat aktif."
+                        );
+
+                    } else if (
+                        error.code === 3
+                    ) {
+
+                        alert(
+                            "❌ Pengambilan lokasi terlalu lama. Coba lagi."
+                        );
+
+                    } else {
+
+                        alert(
+                            "❌ Terjadi masalah saat mengambil lokasi."
+                        );
+
+                    }
+
+                },
+
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error:",
+                error
+            );
+
+            status.textContent =
+                "❌ Terjadi kesalahan.";
+
+            alert(
+                "Terjadi kesalahan: " +
+                error.message
+            );
+
+        }
+
+    }
+);
+
+
+// ====================================
+// FUNGSI HITUNG JARAK
+// ====================================
+
+function hitungJarak(
+    lat1,
+    lon1,
+    lat2,
+    lon2
+) {
+
+    const R =
+        6371000;
+
+
+    const dLat =
+        (lat2 - lat1) *
+        Math.PI / 180;
+
+
+    const dLon =
+        (lon2 - lon1) *
+        Math.PI / 180;
+
+
+    const a =
+        Math.sin(dLat / 2) *
+        Math.sin(dLat / 2) +
+
+        Math.cos(
+            lat1 * Math.PI / 180
+        ) *
+
+        Math.cos(
+            lat2 * Math.PI / 180
+        ) *
+
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+
+    const c =
+        2 *
+        Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+
+
+    return R * c;
+
+}
+
+        // ====================================
+        // ABSEN PULANG
+        // ====================================
+
+        document.getElementById(
+            "absenPulang"
+        ).addEventListener(
+            "click",
+            () => {
+
+                alert(
+                    "Fitur Absen Pulang akan kita aktifkan pada tahap berikutnya."
+                );
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>
