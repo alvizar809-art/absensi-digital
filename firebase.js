@@ -17,7 +17,7 @@ import {
 // KONFIGURASI FIREBASE
 // ===============================
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyCL-MhFb-_jaQmHBg_vUxMY-i99xQ1mgVU",
   authDomain: "absensi-digital-sekolah-d05ad.firebaseapp.com",
   projectId: "absensi-digital-sekolah-d05ad",
