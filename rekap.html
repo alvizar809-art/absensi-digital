@@ -9,6 +9,20 @@
     <title>Rekap Absensi - Absensi Digital</title>
 
    <style>
+
+    .export-pdf-button {
+    border: none;
+    background: #dc3545;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.export-pdf-button:hover {
+    opacity: 0.9;
+}
     .export-button {
     border: none;
     background: #198754;
@@ -303,6 +317,13 @@
     📊 Export Excel
 </button>
 
+<button
+    id="exportPDF"
+    class="export-pdf-button"
+>
+    📄 Export PDF
+</button>
+
             </div>
 
 
@@ -364,6 +385,10 @@
 
     <!-- FIREBASE -->
      <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
     <script type="module">
 
@@ -840,6 +865,248 @@ document.getElementById(
 
         XLSX.writeFile(
             workbook,
+            namaFile
+        );
+
+    }
+);
+
+// ====================================
+// EXPORT PDF
+// ====================================
+
+document.getElementById(
+    "exportPDF"
+).addEventListener(
+    "click",
+    () => {
+
+        const tanggal =
+            document.getElementById(
+                "filterTanggal"
+            ).value;
+
+        const nama =
+            document.getElementById(
+                "filterNama"
+            ).value
+            .toLowerCase();
+
+        const kelas =
+            document.getElementById(
+                "filterKelas"
+            ).value;
+
+
+        // Ambil data sesuai filter
+
+        const hasil =
+            semuaData.filter((data) => {
+
+                const cocokTanggal =
+                    !tanggal ||
+                    data.tanggal === tanggal;
+
+
+                const cocokNama =
+                    !nama ||
+                    (data.nama || "")
+                        .toLowerCase()
+                        .includes(nama);
+
+
+                const cocokKelas =
+                    !kelas ||
+                    data.kelas === kelas;
+
+
+                return (
+                    cocokTanggal &&
+                    cocokNama &&
+                    cocokKelas
+                );
+
+            });
+
+
+        if (hasil.length === 0) {
+
+            alert(
+                "Tidak ada data untuk diexport."
+            );
+
+            return;
+
+        }
+
+
+        // ====================================
+        // BUAT PDF
+        // ====================================
+
+        const {
+            jsPDF
+        } = window.jspdf;
+
+
+        const pdf =
+            new jsPDF({
+                orientation: "landscape",
+                unit: "mm",
+                format: "a4"
+            });
+
+
+        // ====================================
+        // JUDUL
+        // ====================================
+
+        pdf.setFontSize(16);
+
+        pdf.text(
+            "REKAP ABSENSI DIGITAL SEKOLAH",
+            148,
+            15,
+            {
+                align: "center"
+            }
+        );
+
+
+        pdf.setFontSize(10);
+
+        let keterangan =
+            "Semua Data";
+
+
+        if (tanggal) {
+
+            keterangan =
+                "Tanggal: " + tanggal;
+
+        }
+
+
+        if (kelas) {
+
+            keterangan +=
+                " | Kelas: " + kelas;
+
+        }
+
+
+        if (nama) {
+
+            keterangan +=
+                " | Nama: " + nama;
+
+        }
+
+
+        pdf.text(
+            keterangan,
+            148,
+            22,
+            {
+                align: "center"
+            }
+        );
+
+
+        // ====================================
+        // DATA TABEL
+        // ====================================
+
+        const rows =
+            hasil.map(
+                (data, index) => [
+
+                    index + 1,
+
+                    data.nama || "-",
+
+                    data.nis || "-",
+
+                    data.kelas || "-",
+
+                    data.tanggal || "-",
+
+                    data.jamMasuk || "-",
+
+                    data.jamPulang || "-",
+
+                    data.status || "-"
+
+                ]
+            );
+
+
+        pdf.autoTable({
+
+            startY: 28,
+
+            head: [[
+
+                "No",
+                "Nama",
+                "NIS",
+                "Kelas",
+                "Tanggal",
+                "Jam Masuk",
+                "Jam Pulang",
+                "Status"
+
+            ]],
+
+            body: rows,
+
+            theme: "grid",
+
+            styles: {
+
+                fontSize: 8,
+
+                cellPadding: 3
+
+            },
+
+            headStyles: {
+
+                fontSize: 8
+
+            }
+
+        });
+
+
+        // ====================================
+        // SIMPAN PDF
+        // ====================================
+
+        let namaFile =
+            "Rekap_Absensi";
+
+
+        if (tanggal) {
+
+            namaFile +=
+                "_" + tanggal;
+
+        }
+
+
+        if (kelas) {
+
+            namaFile +=
+                "_Kelas_" + kelas;
+
+        }
+
+
+        namaFile += ".pdf";
+
+
+        pdf.save(
             namaFile
         );
 
