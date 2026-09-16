@@ -401,6 +401,7 @@
     where,
     getDocs,
     addDoc,
+     updateDoc,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
@@ -1037,6 +1038,405 @@ document.getElementById(
     }
 );
 
+// ====================================
+// ABSEN PULANG + GPS
+// ====================================
+
+document.getElementById(
+    "absenPulang"
+).addEventListener(
+    "click",
+    async () => {
+
+        const sekolahLatitude =
+            -6.6128304;
+
+        const sekolahLongitude =
+            106.7323152;
+
+        const radiusMaksimal =
+            100;
+
+        const status =
+            document.getElementById(
+                "attendanceStatus"
+            );
+
+        status.textContent =
+            "📍 Sedang mengambil lokasi kamu...";
+
+
+        try {
+
+            // ====================================
+            // CEK LOGIN
+            // ====================================
+
+            const user =
+                auth.currentUser;
+
+
+            if (!user) {
+
+                alert(
+                    "Sesi login sudah berakhir. Silakan login kembali."
+                );
+
+                window.location.href =
+                    "index.html";
+
+                return;
+
+            }
+
+
+            // ====================================
+            // AMBIL LOKASI
+            // ====================================
+
+            navigator.geolocation.getCurrentPosition(
+
+                async (position) => {
+
+                    try {
+
+                        const latitude =
+                            position.coords.latitude;
+
+                        const longitude =
+                            position.coords.longitude;
+
+                        const accuracy =
+                            position.coords.accuracy;
+
+
+                        // ====================================
+                        // HITUNG JARAK
+                        // ====================================
+
+                        const jarak =
+                            hitungJarak(
+                                latitude,
+                                longitude,
+                                sekolahLatitude,
+                                sekolahLongitude
+                            );
+
+
+                        console.log(
+                            "Jarak pulang:",
+                            jarak,
+                            "meter"
+                        );
+
+
+                        // ====================================
+                        // CEK RADIUS
+                        // ====================================
+
+                        if (
+                            jarak >
+                            radiusMaksimal
+                        ) {
+
+                            status.textContent =
+                                `❌ Jarak kamu ${jarak.toFixed(1)} meter dari sekolah.`;
+
+                            alert(
+                                `❌ Absen pulang ditolak.\n\n` +
+                                `Jarak kamu dari sekolah: ${jarak.toFixed(1)} meter\n` +
+                                `Maksimal jarak: ${radiusMaksimal} meter`
+                            );
+
+                            return;
+
+                        }
+
+
+                        // ====================================
+                        // TANGGAL & JAM
+                        // ====================================
+
+                        const sekarang =
+                            new Date();
+
+
+                        const tahun =
+                            sekarang.getFullYear();
+
+                        const bulan =
+                            String(
+                                sekarang.getMonth() + 1
+                            ).padStart(2, "0");
+
+                        const tanggal =
+                            String(
+                                sekarang.getDate()
+                            ).padStart(2, "0");
+
+                        const jam =
+                            String(
+                                sekarang.getHours()
+                            ).padStart(2, "0");
+
+                        const menit =
+                            String(
+                                sekarang.getMinutes()
+                            ).padStart(2, "0");
+
+                        const detik =
+                            String(
+                                sekarang.getSeconds()
+                            ).padStart(2, "0");
+
+
+                        const tanggalHariIni =
+                            `${tahun}-${bulan}-${tanggal}`;
+
+
+                        const jamSekarang =
+                            `${jam}:${menit}:${detik}`;
+
+
+                        // ====================================
+                        // CARI ABSEN MASUK HARI INI
+                        // ====================================
+
+                        const absensiQuery =
+                            query(
+                                collection(
+                                    db,
+                                    "absensi"
+                                ),
+                                where(
+                                    "uid",
+                                    "==",
+                                    user.uid
+                                ),
+                                where(
+                                    "tanggal",
+                                    "==",
+                                    tanggalHariIni
+                                )
+                            );
+
+
+                        const snapshot =
+                            await getDocs(
+                                absensiQuery
+                            );
+
+
+                        // ====================================
+                        // BELUM ABSEN MASUK
+                        // ====================================
+
+                        if (
+                            snapshot.empty
+                        ) {
+
+                            alert(
+                                "❌ Kamu belum melakukan Absen Masuk hari ini."
+                            );
+
+                            status.textContent =
+                                "⚠️ Silakan Absen Masuk terlebih dahulu.";
+
+                            return;
+
+                        }
+
+
+                        // ====================================
+                        // AMBIL DATA ABSENSI
+                        // ====================================
+
+                        let absensiDoc =
+                            null;
+
+
+                        let absensiData =
+                            null;
+
+
+                        snapshot.forEach(
+                            (docSnapshot) => {
+
+                                absensiDoc =
+                                    docSnapshot;
+
+                                absensiData =
+                                    docSnapshot.data();
+
+                            }
+                        );
+
+
+                        // ====================================
+                        // CEK SUDAH ABSEN PULANG
+                        // ====================================
+
+                        if (
+                            absensiData.jamPulang
+                        ) {
+
+                            alert(
+                                "⚠️ Kamu sudah melakukan Absen Pulang hari ini."
+                            );
+
+                            status.textContent =
+                                "⚠️ Absen pulang sudah dilakukan.";
+
+                            return;
+
+                        }
+
+
+                        // ====================================
+                        // UPDATE ABSEN PULANG
+                        // ====================================
+
+                        await updateDoc(
+                            absensiDoc.ref,
+                            {
+
+                                jamPulang:
+                                    jamSekarang,
+
+                                latitudePulang:
+                                    latitude,
+
+                                longitudePulang:
+                                    longitude,
+
+                                jarakPulangMeter:
+                                    Number(
+                                        jarak.toFixed(2)
+                                    ),
+
+                                akurasiPulangGPS:
+                                    Number(
+                                        accuracy.toFixed(2)
+                                    ),
+
+                                updatedAt:
+                                    serverTimestamp()
+
+                            }
+                        );
+
+
+                        // ====================================
+                        // BERHASIL
+                        // ====================================
+
+                        status.textContent =
+                            `✅ Absen pulang berhasil. Jarak ${jarak.toFixed(1)} meter.`;
+
+
+                        alert(
+                            `✅ Absen pulang berhasil!\n\n` +
+                            `Tanggal: ${tanggalHariIni}\n` +
+                            `Jam pulang: ${jamSekarang}\n` +
+                            `Jarak: ${jarak.toFixed(1)} meter\n` +
+                            `Akurasi GPS: ±${accuracy.toFixed(1)} meter`
+                        );
+
+
+                    } catch (error) {
+
+                        console.error(
+                            "Error Absen Pulang:",
+                            error
+                        );
+
+                        status.textContent =
+                            "❌ Gagal menyimpan Absen Pulang.";
+
+                        alert(
+                            "Gagal melakukan Absen Pulang: " +
+                            error.message
+                        );
+
+                    }
+
+                },
+
+
+                (error) => {
+
+                    console.error(
+                        "GPS Error:",
+                        error
+                    );
+
+                    status.textContent =
+                        "❌ Lokasi tidak dapat diperoleh.";
+
+
+                    if (
+                        error.code === 1
+                    ) {
+
+                        alert(
+                            "❌ Izin lokasi ditolak."
+                        );
+
+                    } else if (
+                        error.code === 2
+                    ) {
+
+                        alert(
+                            "❌ Lokasi tidak tersedia. Pastikan GPS aktif."
+                        );
+
+                    } else if (
+                        error.code === 3
+                    ) {
+
+                        alert(
+                            "❌ Pengambilan lokasi terlalu lama. Coba lagi."
+                        );
+
+                    } else {
+
+                        alert(
+                            "❌ Terjadi masalah saat mengambil lokasi."
+                        );
+
+                    }
+
+                },
+
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0
+                }
+
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error:",
+                error
+            );
+
+            status.textContent =
+                "❌ Terjadi kesalahan.";
+
+            alert(
+                "Terjadi kesalahan: " +
+                error.message
+            );
+
+        }
+
+    }
+);
 
 // ====================================
 // FUNGSI HITUNG JARAK
