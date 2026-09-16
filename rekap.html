@@ -10,6 +10,62 @@
 
    <style>
 
+    /* =========================
+   STATISTIK REKAP
+========================= */
+
+.rekap-statistik {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-card > span {
+    font-size: 24px;
+}
+
+.stat-card p {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.stat-card strong {
+    font-size: 22px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+
+    .rekap-statistik {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .rekap-statistik {
+        grid-template-columns: 1fr;
+    }
+
+}
+
     .export-pdf-button {
     border: none;
     background: #dc3545;
@@ -274,6 +330,51 @@
             <h2>
                 Data Absensi Peserta
             </h2>
+            <!-- STATISTIK REKAP -->
+
+<div class="rekap-statistik">
+
+    <div class="stat-card">
+        <span>👥</span>
+        <div>
+            <p>Total Absensi</p>
+            <strong id="jumlahAbsensi">0</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <span>🟢</span>
+        <div>
+            <p>Hadir</p>
+            <strong id="jumlahHadir">0</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <span>🕘</span>
+        <div>
+            <p>Sudah Masuk</p>
+            <strong id="jumlahMasuk">0</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <span>🔴</span>
+        <div>
+            <p>Sudah Pulang</p>
+            <strong id="jumlahPulang">0</strong>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <span>⏳</span>
+        <div>
+            <p>Belum Pulang</p>
+            <strong id="jumlahBelumPulang">0</strong>
+        </div>
+    </div>
+
+</div>
 
 
             <!-- FILTER -->
@@ -605,6 +706,83 @@
                     );
 
                 });
+
+                // ====================================
+// HITUNG STATISTIK
+// ====================================
+
+let jumlahHadir = 0;
+let jumlahMasuk = 0;
+let jumlahPulang = 0;
+let jumlahBelumPulang = 0;
+
+
+hasil.forEach((data) => {
+
+    // Total hadir
+    if (
+        data.status === "Hadir"
+    ) {
+
+        jumlahHadir++;
+
+    }
+
+
+    // Sudah absen masuk
+    if (
+        data.jamMasuk &&
+        data.jamMasuk !== "-"
+    ) {
+
+        jumlahMasuk++;
+
+    }
+
+
+    // Sudah absen pulang
+    if (
+        data.jamPulang &&
+        data.jamPulang !== "-" &&
+        data.jamPulang !== "Belum absen"
+    ) {
+
+        jumlahPulang++;
+
+    } else {
+
+        jumlahBelumPulang++;
+
+    }
+
+});
+
+
+// Tampilkan statistik
+
+document.getElementById(
+    "jumlahAbsensi"
+).textContent = hasil.length;
+
+
+document.getElementById(
+    "jumlahHadir"
+).textContent = jumlahHadir;
+
+
+document.getElementById(
+    "jumlahMasuk"
+).textContent = jumlahMasuk;
+
+
+document.getElementById(
+    "jumlahPulang"
+).textContent = jumlahPulang;
+
+
+document.getElementById(
+    "jumlahBelumPulang"
+).textContent = jumlahBelumPulang;
 
 
             table.innerHTML = "";
