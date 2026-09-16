@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rekap Absensi - Absensi Digital</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 18px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            font-size: 22px;
+        }
+
+        .back-button {
+            border: none;
+            background: #6c757d;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+        }
+
+        .filter {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter input,
+        .filter select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f1f3f5;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+        }
+
+        @media (max-width: 700px) {
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .container {
+                margin-top: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <header class="header">
+
+        <h1>
+            📋 Rekap Absensi
+        </h1>
+
+        <button
+            class="back-button"
+            id="backButton"
+        >
+            ← Dashboard
+        </button>
+
+    </header>
+
+
+    <main class="container">
+
+        <section class="card">
+
+            <h2>
+                Data Absensi Peserta
+            </h2>
+
+
+            <!-- FILTER -->
+
+            <div class="filter">
+
+                <input
+                    type="date"
+                    id="filterTanggal"
+                >
+
+                <input
+                    type="text"
+                    id="filterNama"
+                    placeholder="Cari nama..."
+                >
+
+                <select id="filterKelas">
+
+                    <option value="">
+                        Semua Kelas
+                    </option>
+
+                    <option value="7">
+                        Kelas 7
+                    </option>
+
+                    <option value="8">
+                        Kelas 8
+                    </option>
+
+                    <option value="9">
+                        Kelas 9
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>No</th>
+
+                            <th>Nama</th>
+
+                            <th>NIS</th>
+
+                            <th>Kelas</th>
+
+                            <th>Tanggal</th>
+
+                            <th>Jam Masuk</th>
+
+                            <th>Jam Pulang</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="absensiTable">
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="empty"
+                            >
+                                Memuat data...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FIREBASE -->
+
+    <script type="module">
+
+        import {
+            auth,
+            db
+        } from "./firebase.js";
+
+
+        import {
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+
+        import {
+            collection,
+            getDocs
+        } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+
+        // ====================================
+        // CEK LOGIN
+        // ====================================
+
+        onAuthStateChanged(auth, async (user) => {
+
+            if (!user) {
+
+                window.location.href = "index.html";
+
+                return;
+
+            }
+
+
+            try {
+
+                const snapshot =
+                    await getDocs(
+                        collection(db, "users")
+                    );
+
+
+                let isAdmin = false;
+
+
+                snapshot.forEach((item) => {
+
+                    const data =
+                        item.data();
+
+
+                    if (
+                        data.uid === user.uid &&
+                        data.role === "admin"
+                    ) {
+
+                        isAdmin = true;
+
+                    }
+
+                });
+
+
+                if (!isAdmin) {
+
+                    alert(
+                        "Halaman ini hanya dapat diakses Admin."
+                    );
+
+                    window.location.href =
+                        "index.html";
+
+                    return;
+
+                }
+
+
+                loadAbsensi();
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Gagal memeriksa akses Admin."
+                );
+
+            }
+
+        });
+
+
+        // ====================================
+        // LOAD DATA ABSENSI
+        // ====================================
+
+        let semuaData = [];
+
+
+        async function loadAbsensi() {
+
+            const table =
+                document.getElementById(
+                    "absensiTable"
+                );
+
+
+            try {
+
+                const snapshot =
+                    await getDocs(
+                        collection(
+                            db,
+                            "absensi"
+                        )
+                    );
+
+
+                semuaData = [];
+
+
+                snapshot.forEach((item) => {
+
+                    semuaData.push(
+                        item.data()
+                    );
+
+                });
+
+
+                tampilkanData();
+
+            } catch (error) {
+
+                console.error(error);
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="empty"
+                        >
+                            Gagal mengambil data absensi.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+
+        }
+
+
+        // ====================================
+        // TAMPILKAN DATA
+        // ====================================
+
+        function tampilkanData() {
+
+            const table =
+                document.getElementById(
+                    "absensiTable"
+                );
+
+
+            const tanggal =
+                document.getElementById(
+                    "filterTanggal"
+                ).value;
+
+
+            const nama =
+                document.getElementById(
+                    "filterNama"
+                ).value
+                .toLowerCase();
+
+
+            const kelas =
+                document.getElementById(
+                    "filterKelas"
+                ).value;
+
+
+            const hasil =
+                semuaData.filter((data) => {
+
+                    const cocokTanggal =
+                        !tanggal ||
+                        data.tanggal === tanggal;
+
+
+                    const cocokNama =
+                        !nama ||
+                        (data.nama || "")
+                            .toLowerCase()
+                            .includes(nama);
+
+
+                    const cocokKelas =
+                        !kelas ||
+                        data.kelas === kelas;
+
+
+                    return (
+                        cocokTanggal &&
+                        cocokNama &&
+                        cocokKelas
+                    );
+
+                });
+
+
+            table.innerHTML = "";
+
+
+            if (hasil.length === 0) {
+
+                table.innerHTML = `
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="empty"
+                        >
+                            Tidak ada data absensi.
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            hasil.forEach((data, index) => {
+
+                const row =
+                    document.createElement("tr");
+
+
+                row.innerHTML = `
+
+                    <td>${index + 1}</td>
+
+                    <td>${data.nama || "-"}</td>
+
+                    <td>${data.nis || "-"}</td>
+
+                    <td>${data.kelas || "-"}</td>
+
+                    <td>${data.tanggal || "-"}</td>
+
+                    <td>${data.jamMasuk || "-"}</td>
+
+                    <td>${data.jamPulang || "-"}</td>
+
+                    <td>${data.status || "-"}</td>
+
+                `;
+
+
+                table.appendChild(row);
+
+            });
+
+        }
+
+
+        // ====================================
+        // FILTER
+        // ====================================
+
+        document.getElementById(
+            "filterTanggal"
+        ).addEventListener(
+            "change",
+            tampilkanData
+        );
+
+
+        document.getElementById(
+            "filterNama"
+        ).addEventListener(
+            "input",
+            tampilkanData
+        );
+
+
+        document.getElementById(
+            "filterKelas"
+        ).addEventListener(
+            "change",
+            tampilkanData
+        );
+
+
+        // ====================================
+        // KEMBALI
+        // ====================================
+
+        document.getElementById(
+            "backButton"
+        ).addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "admin.html";
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
