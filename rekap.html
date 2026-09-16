@@ -8,113 +8,216 @@
 
     <title>Rekap Absensi - Absensi Digital</title>
 
-    <style>
+   <style>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #333;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        color: #333;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .header {
+        background: white;
+        padding: 18px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+    .back-button {
+        border: none;
+        background: #6c757d;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .back-button:hover {
+        opacity: 0.9;
+    }
+
+
+    /* =========================
+       CONTAINER
+    ========================= */
+
+    .container {
+        max-width: 1250px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+
+    /* =========================
+       CARD
+    ========================= */
+
+    .card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+        margin-bottom: 20px;
+        font-size: 20px;
+    }
+
+
+    /* =========================
+       FILTER
+    ========================= */
+
+    .filter {
+        display: grid;
+        grid-template-columns: 1fr 1fr 180px auto;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .filter input,
+    .filter select {
+        width: 100%;
+        padding: 11px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+    }
+
+    .filter input:focus,
+    .filter select:focus {
+        outline: none;
+        border-color: #6c757d;
+    }
+
+
+    /* =========================
+       TABLE
+    ========================= */
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    table {
+        width: 100%;
+        min-width: 950px;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    th {
+        background: #f1f3f5;
+        font-size: 14px;
+    }
+
+    td {
+        font-size: 14px;
+    }
+
+    tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    td:last-child {
+        font-weight: bold;
+    }
+
+
+    /* =========================
+       DATA KOSONG
+    ========================= */
+
+    .empty {
+        text-align: center;
+        color: #777;
+        padding: 25px;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 800px) {
 
         .header {
-            background: white;
-            padding: 18px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 15px;
         }
 
         .header h1 {
-            font-size: 22px;
+            font-size: 18px;
         }
 
         .back-button {
-            border: none;
-            background: #6c757d;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            cursor: pointer;
+            padding: 9px 12px;
+            font-size: 13px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
+            margin: 20px auto;
+            padding: 0 12px;
         }
 
         .card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 15px;
         }
 
         .card h2 {
-            margin-bottom: 20px;
+            font-size: 18px;
         }
 
         .filter {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+            grid-template-columns: 1fr;
+            gap: 10px;
         }
 
         .filter input,
         .filter select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        .table-container {
-            overflow-x: auto;
+            padding: 12px;
         }
 
         table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
+            min-width: 950px;
         }
 
-        th,
-        td {
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
+    }
 
-        th {
-            background: #f1f3f5;
-        }
-
-        .empty {
-            text-align: center;
-            color: #777;
-            padding: 25px;
-        }
-
-        @media (max-width: 700px) {
-
-            .header h1 {
-                font-size: 18px;
-            }
-
-            .container {
-                margin-top: 20px;
-            }
-
-        }
-
-    </style>
+</style>
 
 </head>
 
