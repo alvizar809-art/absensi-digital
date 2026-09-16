@@ -454,6 +454,8 @@
 
                             <th>Status</th>
 
+                            <th>Keterangan</th>
+
                         </tr>
 
                     </thead>
@@ -464,7 +466,7 @@
                         <tr>
 
                             <td
-                                colspan="8"
+                                colspan="9"
                                 class="empty"
                             >
                                 Memuat data...
@@ -646,7 +648,36 @@
             }
 
         }
+// ====================================
+// CEK KETERLAMBATAN
+// ====================================
 
+function cekKeterlambatan(jamMasuk) {
+
+    if (
+        !jamMasuk ||
+        jamMasuk === "-"
+    ) {
+
+        return "Belum Absen";
+
+    }
+
+
+    // Batas waktu masuk sekolah
+    const batasJam = "07:00:00";
+
+
+    if (jamMasuk <= batasJam) {
+
+        return "Tepat Waktu";
+
+    }
+
+
+    return "Terlambat";
+
+}
 
         // ====================================
         // TAMPILKAN DATA
@@ -795,7 +826,7 @@ document.getElementById(
                     <tr>
 
                         <td
-                            colspan="8"
+                            colspan="9"
                             class="empty"
                         >
                             Tidak ada data absensi.
@@ -817,25 +848,33 @@ document.getElementById(
                     document.createElement("tr");
 
 
-                row.innerHTML = `
+                const keterangan =
+    cekKeterlambatan(
+        data.jamMasuk
+    );
 
-                    <td>${index + 1}</td>
 
-                    <td>${data.nama || "-"}</td>
+row.innerHTML = `
 
-                    <td>${data.nis || "-"}</td>
+    <td>${index + 1}</td>
 
-                    <td>${data.kelas || "-"}</td>
+    <td>${data.nama || "-"}</td>
 
-                    <td>${data.tanggal || "-"}</td>
+    <td>${data.nis || "-"}</td>
 
-                    <td>${data.jamMasuk || "-"}</td>
+    <td>${data.kelas || "-"}</td>
 
-                    <td>${data.jamPulang || "-"}</td>
+    <td>${data.tanggal || "-"}</td>
 
-                    <td>${data.status || "-"}</td>
+    <td>${data.jamMasuk || "-"}</td>
 
-                `;
+    <td>${data.jamPulang || "-"}</td>
+
+    <td>${data.status || "-"}</td>
+
+    <td>${keterangan}</td>
+
+`;
 
 
                 table.appendChild(row);
@@ -996,7 +1035,12 @@ document.getElementById(
                     data.akurasiPulangGPS ?? "-",
 
                 "Status":
-                    data.status || "-"
+                    data.status || "-",
+                    "Keterangan":
+
+    cekKeterlambatan(
+        data.jamMasuk
+    )
 
             }));
 
@@ -1213,7 +1257,11 @@ document.getElementById(
 
                     data.jamPulang || "-",
 
-                    data.status || "-"
+                    data.status || "-",
+
+                    cekKeterlambatan(
+    data.jamMasuk
+)
 
                 ]
             );
@@ -1232,7 +1280,8 @@ document.getElementById(
                 "Tanggal",
                 "Jam Masuk",
                 "Jam Pulang",
-                "Status"
+                "Status",
+                "Keterangan"
 
             ]],
 
