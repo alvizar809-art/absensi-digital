@@ -9,6 +9,19 @@
     <title>Rekap Absensi - Absensi Digital</title>
 
    <style>
+    .export-button {
+    border: none;
+    background: #198754;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.export-button:hover {
+    opacity: 0.9;
+}
 
     * {
         box-sizing: border-box;
@@ -283,6 +296,12 @@
                     </option>
 
                 </select>
+                <button
+    id="exportExcel"
+    class="export-button"
+>
+    📊 Export Excel
+</button>
 
             </div>
 
@@ -344,6 +363,7 @@
 
 
     <!-- FIREBASE -->
+     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
     <script type="module">
 
@@ -665,7 +685,166 @@
 
             }
         );
+// ====================================
+// EXPORT EXCEL
+// ====================================
 
+document.getElementById(
+    "exportExcel"
+).addEventListener(
+    "click",
+    () => {
+
+        const tanggal =
+            document.getElementById(
+                "filterTanggal"
+            ).value;
+
+        const nama =
+            document.getElementById(
+                "filterNama"
+            ).value
+            .toLowerCase();
+
+        const kelas =
+            document.getElementById(
+                "filterKelas"
+            ).value;
+
+
+        // Ambil data sesuai filter
+
+        const hasil =
+            semuaData.filter((data) => {
+
+                const cocokTanggal =
+                    !tanggal ||
+                    data.tanggal === tanggal;
+
+
+                const cocokNama =
+                    !nama ||
+                    (data.nama || "")
+                        .toLowerCase()
+                        .includes(nama);
+
+
+                const cocokKelas =
+                    !kelas ||
+                    data.kelas === kelas;
+
+
+                return (
+                    cocokTanggal &&
+                    cocokNama &&
+                    cocokKelas
+                );
+
+            });
+
+
+        if (hasil.length === 0) {
+
+            alert(
+                "Tidak ada data untuk diexport."
+            );
+
+            return;
+
+        }
+
+
+        // Buat data Excel
+
+        const dataExcel =
+            hasil.map((data, index) => ({
+
+                "No":
+                    index + 1,
+
+                "Nama":
+                    data.nama || "-",
+
+                "NIS":
+                    data.nis || "-",
+
+                "Kelas":
+                    data.kelas || "-",
+
+                "Tanggal":
+                    data.tanggal || "-",
+
+                "Jam Masuk":
+                    data.jamMasuk || "-",
+
+                "Jam Pulang":
+                    data.jamPulang || "-",
+
+                "Jarak Masuk (m)":
+                    data.jarakMeter ?? "-",
+
+                "Akurasi GPS Masuk (m)":
+                    data.akurasiGPS ?? "-",
+
+                "Jarak Pulang (m)":
+                    data.jarakPulangMeter ?? "-",
+
+                "Akurasi GPS Pulang (m)":
+                    data.akurasiPulangGPS ?? "-",
+
+                "Status":
+                    data.status || "-"
+
+            }));
+
+
+        // Buat worksheet
+
+        const worksheet =
+            XLSX.utils.json_to_sheet(
+                dataExcel
+            );
+
+
+        // Buat workbook
+
+        const workbook =
+            XLSX.utils.book_new();
+
+
+        XLSX.utils.book_append_sheet(
+            workbook,
+            worksheet,
+            "Rekap Absensi"
+        );
+
+
+        // Nama file
+
+        let namaFile =
+            "Rekap_Absensi";
+
+
+        if (tanggal) {
+
+            namaFile +=
+                "_" + tanggal;
+
+        }
+
+
+        namaFile += ".xlsx";
+
+
+        // Download Excel
+
+        XLSX.writeFile(
+            workbook,
+            namaFile
+        );
+
+    }
+);
     </script>
 
 </body>
